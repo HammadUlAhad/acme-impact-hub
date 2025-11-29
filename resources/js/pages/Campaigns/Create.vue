@@ -39,7 +39,7 @@ const handleImageChange = (event) => {
 };
 
 const submit = () => {
-    form.post(route('campaigns.store'));
+    form.post('/campaigns');
 };
 
 const breadcrumbs = [
@@ -133,8 +133,8 @@ const breadcrumbs = [
                                     ]"
                                 >
                                     <option value="" disabled>Select a cause category</option>
-                                    <option v-for="category in categories" :key="category" :value="category">
-                                        {{ category }}
+                                    <option v-for="(label, key) in categories" :key="key" :value="key">
+                                        {{ label }}
                                     </option>
                                 </select>
                                 <p v-if="form.errors.cause_category" class="text-sm text-red-600">

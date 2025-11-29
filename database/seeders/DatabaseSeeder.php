@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
         ]);
 
-        // Create test admin user
+        // Create admin user
         $admin = User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@acme.com',
@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
         ]);
         $admin->assignRole('admin');
 
-        // Create test campaign manager
+        // Create campaign manager user
         $campaignManager = User::factory()->create([
             'name' => 'Campaign Manager',
             'email' => 'campaigns@acme.com',
@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
         ]);
         $campaignManager->assignRole('campaign_manager');
 
-        // Create test employee
+        // Create employee user
         $employee = User::factory()->create([
             'name' => 'John Employee',
             'email' => 'john@acme.com',

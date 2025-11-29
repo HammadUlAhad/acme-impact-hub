@@ -144,8 +144,7 @@ class DonationController extends Controller
 
     private function processCreditCard(Donation $donation): void
     {
-        // TODO: Integrate with actual payment gateway
-        // For now, we'll simulate successful payment
+        // Simulate payment processing - replace with actual payment gateway integration
         $donation->update([
             'payment_status' => Donation::STATUS_COMPLETED,
             'processed_at' => now(),
@@ -158,8 +157,7 @@ class DonationController extends Controller
 
     private function processDigitalWallet(Donation $donation): void
     {
-        // TODO: Integrate with digital wallet providers
-        // For now, we'll simulate successful payment
+        // Simulate payment processing - replace with digital wallet provider integration
         $donation->update([
             'payment_status' => Donation::STATUS_COMPLETED,
             'processed_at' => now(),

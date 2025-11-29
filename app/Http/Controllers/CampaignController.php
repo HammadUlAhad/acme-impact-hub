@@ -45,8 +45,7 @@ class CampaignController extends Controller
 
     public function create(): Response
     {
-        // Temporarily disable authorization for testing
-        // Gate::authorize('create', Campaign::class);
+        Gate::authorize('create', Campaign::class);
 
         return Inertia::render('Campaigns/Create', [
             'categories' => Campaign::getCauseCategories(),
