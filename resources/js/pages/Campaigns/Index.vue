@@ -74,14 +74,6 @@ const formatCurrency = (amount: number) => {
     }).format(amount);
 };
 
-const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
-};
-
 const getStatusColor = (status: string) => {
     const colors = {
         active: 'bg-green-100 text-green-800',
@@ -266,13 +258,13 @@ const getCategoryColor = (category: string) => {
                     <Link v-for="link in campaigns.links" 
                        :key="link.label"
                        :href="link.url"
-                       v-html="link.label"
                        :class="[
                            'px-3 py-2 text-sm border',
                            link.active 
                                ? 'bg-blue-600 text-white border-blue-600' 
                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                        ]">
+                        {{ link.label }}
                     </Link>
                 </nav>
             </div>

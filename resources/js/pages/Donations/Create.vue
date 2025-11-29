@@ -1,5 +1,5 @@
-<script setup>
-import { ref, computed } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
 import { Head, useForm, Link } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
