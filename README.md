@@ -1,6 +1,6 @@
 # ACME Impact Hub - Corporate Social Responsibility Platform
 
-[![Laravel](https://img.shields.io/badge/Laravel-11-red.svg)](https://laravel.com)
+[![Laravel](https://img.shields.io/badge/Laravel-12-red.svg)](https://laravel.com)
 [![Vue.js](https://img.shields.io/badge/Vue.js-3-green.svg)](https://vuejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-teal.svg)](https://tailwindcss.com)
@@ -37,7 +37,7 @@ Built with modern enterprise-grade technologies, the platform successfully addre
 
 ### Backend
 - **PHP 8.3** - Latest stable version with modern features
-- **Laravel 11** - Latest LTS framework with advanced capabilities
+- **Laravel 12** - Latest LTS framework with advanced capabilities
 - **SQLite** - Lightweight, serverless database (PostgreSQL/MySQL ready)
 - **Composer** - Dependency management
 - **Pest** - Modern testing framework
@@ -407,7 +407,7 @@ While built as a monolithic application with Inertia.js, the architecture suppor
 ### Technical Requirements - COMPLETE
 - **Vue.js (Latest)**: Vue.js 3.5 with Composition API and TypeScript
 - **PHP (Latest)**: PHP 8.3 with modern features
-- **Laravel (Latest)**: Laravel 11 LTS framework
+- **Laravel (Latest)**: Laravel 12 LTS framework
 - **Composer**: Dependency management included
 - **Pest Testing**: Modern PHP testing framework configured
 - **PHPStan Level 8**: Maximum static analysis implemented
