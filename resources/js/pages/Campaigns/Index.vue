@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 
 interface Campaign {
@@ -116,14 +116,14 @@ const getCategoryColor = (category: string) => {
                     <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Campaigns</h1>
                     <p class="text-sm sm:text-base text-gray-600 mt-1">Browse and support causes that matter to you</p>
                 </div>
-                <a href="/campaigns/create" 
+                <Link href="/campaigns/create" 
                    class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium flex-shrink-0">
                     <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
                     </svg>
                     <span class="hidden sm:inline">Create Campaign</span>
                     <span class="sm:hidden">Create</span>
-                </a>
+                </Link>
             </div>
 
             <!-- Filters -->
@@ -230,15 +230,15 @@ const getCategoryColor = (category: string) => {
 
                         <!-- Actions -->
                         <div class="flex space-x-2">
-                            <a :href="`/campaigns/${campaign.id}`" 
+                            <Link :href="`/campaigns/${campaign.id}`" 
                                class="flex-1 text-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm">
                                 View Details
-                            </a>
-                            <a v-if="campaign.status === 'active'" 
-                               :href="`/campaigns/${campaign.id}/donate`" 
+                            </Link>
+                            <Link v-if="campaign.status === 'active'" 
+                               :href="`/donations/create?campaign_id=${campaign.id}`" 
                                class="flex-1 text-center px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm">
                                 Donate Now
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -251,19 +251,19 @@ const getCategoryColor = (category: string) => {
                 </svg>
                 <h3 class="text-xl font-medium text-gray-900 mb-2">No campaigns found</h3>
                 <p class="text-gray-500 mb-4">Try adjusting your search criteria or create a new campaign.</p>
-                <a href="/campaigns/create" 
+                <Link href="/campaigns/create" 
                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                     <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
                     </svg>
                     Create First Campaign
-                </a>
+                </Link>
             </div>
 
             <!-- Pagination -->
             <div v-if="campaigns.links && campaigns.links.length > 3" class="flex justify-center">
                 <nav class="inline-flex rounded-md shadow">
-                    <a v-for="link in campaigns.links" 
+                    <Link v-for="link in campaigns.links" 
                        :key="link.label"
                        :href="link.url"
                        v-html="link.label"
@@ -273,7 +273,7 @@ const getCategoryColor = (category: string) => {
                                ? 'bg-blue-600 text-white border-blue-600' 
                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                        ]">
-                    </a>
+                    </Link>
                 </nav>
             </div>
         </div>

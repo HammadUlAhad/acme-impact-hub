@@ -38,3 +38,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
+
+// Test route for debugging
+Route::get('/test-create', function () {
+    return response()->json(['message' => 'Route is working', 'user' => auth()->user()]);
+});

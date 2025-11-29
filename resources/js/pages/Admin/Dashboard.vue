@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 
 interface Stats {
     total_campaigns: number;
@@ -212,18 +212,18 @@ const getCategoryLabel = (category: string) => {
                 <div class="bg-white rounded-lg shadow p-6">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
                     <div class="space-y-2">
-                        <a href="/campaigns?status=pending" class="block w-full text-left p-2 text-sm text-blue-600 hover:bg-blue-50 rounded">
+                        <Link href="/campaigns?status=pending" class="block w-full text-left p-2 text-sm text-blue-600 hover:bg-blue-50 rounded">
                             Review Pending Campaigns ({{ stats.pending_campaigns }})
-                        </a>
-                        <a href="/campaigns" class="block w-full text-left p-2 text-sm text-gray-700 hover:bg-gray-50 rounded">
+                        </Link>
+                        <Link href="/campaigns" class="block w-full text-left p-2 text-sm text-gray-700 hover:bg-gray-50 rounded">
                             Manage All Campaigns
-                        </a>
-                        <a href="/donations" class="block w-full text-left p-2 text-sm text-gray-700 hover:bg-gray-50 rounded">
+                        </Link>
+                        <Link href="/donations" class="block w-full text-left p-2 text-sm text-gray-700 hover:bg-gray-50 rounded">
                             View All Donations
-                        </a>
-                        <a href="/admin/users" class="block w-full text-left p-2 text-sm text-gray-700 hover:bg-gray-50 rounded">
+                        </Link>
+                        <Link href="/admin/users" class="block w-full text-left p-2 text-sm text-gray-700 hover:bg-gray-50 rounded">
                             Manage Users
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, Link } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,10 +54,10 @@ const paymentMethods = [
             <nav class="flex mb-4 sm:mb-6" aria-label="Breadcrumb">
                 <ol class="inline-flex items-center space-x-1 md:space-x-3">
                     <li v-for="(crumb, index) in breadcrumbs" :key="index" class="inline-flex items-center">
-                        <a v-if="index < breadcrumbs.length - 1" :href="crumb.href" 
+                        <Link v-if="index < breadcrumbs.length - 1" :href="crumb.href" 
                            class="inline-flex items-center text-xs sm:text-sm font-medium text-gray-700 hover:text-blue-600 truncate">
                             {{ crumb.title }}
-                        </a>
+                        </Link>
                         <span v-else class="ml-1 text-xs sm:text-sm font-medium text-gray-500 md:ml-2 truncate">
                             {{ crumb.title }}
                         </span>

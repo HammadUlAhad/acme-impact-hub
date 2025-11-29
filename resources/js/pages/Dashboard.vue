@@ -2,7 +2,7 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -50,7 +50,7 @@ const isAdmin = computed(() =>
             <!-- Quick Actions -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <!-- View Campaigns -->
-                <a href="/campaigns" 
+                <Link href="/campaigns" 
                    class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 sm:p-6 text-white hover:from-blue-600 hover:to-blue-700 transition-colors">
                     <div class="flex items-center">
                         <svg class="w-6 h-6 sm:w-8 sm:h-8 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -61,10 +61,10 @@ const isAdmin = computed(() =>
                             <p class="text-blue-100 text-xs sm:text-sm">Browse active campaigns</p>
                         </div>
                     </div>
-                </a>
+                </Link>
 
                 <!-- Create Campaign -->
-                <a href="/campaigns/create" 
+                <Link href="/campaigns/create" 
                    class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-4 sm:p-6 text-white hover:from-green-600 hover:to-green-700 transition-colors">
                     <div class="flex items-center">
                         <svg class="w-6 h-6 sm:w-8 sm:h-8 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -75,10 +75,10 @@ const isAdmin = computed(() =>
                             <p class="text-green-100 text-xs sm:text-sm">Start a new fundraiser</p>
                         </div>
                     </div>
-                </a>
+                </Link>
 
                 <!-- My Donations -->
-                <a href="/donations" 
+                <Link href="/donations" 
                    class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-4 sm:p-6 text-white hover:from-purple-600 hover:to-purple-700 transition-colors">
                     <div class="flex items-center">
                         <svg class="w-6 h-6 sm:w-8 sm:h-8 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -89,10 +89,10 @@ const isAdmin = computed(() =>
                             <p class="text-purple-100 text-xs sm:text-sm">View donation history</p>
                         </div>
                     </div>
-                </a>
+                </Link>
 
                 <!-- Admin Panel -->
-                <a v-if="isAdmin" href="/admin/dashboard" 
+                <Link v-if="isAdmin" href="/admin/dashboard" 
                    class="bg-gradient-to-r from-red-500 to-red-600 rounded-lg p-4 sm:p-6 text-white hover:from-red-600 hover:to-red-700 transition-colors">
                     <div class="flex items-center">
                         <svg class="w-6 h-6 sm:w-8 sm:h-8 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -103,7 +103,7 @@ const isAdmin = computed(() =>
                             <p class="text-red-100 text-xs sm:text-sm">Manage platform</p>
                         </div>
                     </div>
-                </a>
+                </Link>
             </div>
 
             <!-- Featured Campaigns Preview -->
@@ -111,9 +111,9 @@ const isAdmin = computed(() =>
                 <div class="p-4 sm:p-6 border-b border-gray-200">
                     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
                         <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Featured Campaigns</h2>
-                        <a href="/campaigns" class="text-blue-600 hover:text-blue-700 text-sm font-medium self-start sm:self-auto">
+                        <Link href="/campaigns" class="text-blue-600 hover:text-blue-700 text-sm font-medium self-start sm:self-auto">
                             View All →
-                        </a>
+                        </Link>
                     </div>
                 </div>
                 <div class="p-4 sm:p-6">
@@ -123,9 +123,9 @@ const isAdmin = computed(() =>
                         </svg>
                         <p class="text-lg font-medium">Loading campaigns...</p>
                         <p class="text-sm">Campaign components will be available shortly</p>
-                        <a href="/campaigns" class="inline-block mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                        <Link href="/campaigns" class="inline-block mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
                             Browse All Campaigns
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>
