@@ -2,43 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Campaign\StoreCampaignRequest;
+use App\Http\Requests\Campaign\UpdateCampaignRequest;
 use App\Models\Campaign;
 use App\Models\Donation;
-use Illuminate\Http\Request;
+use App\Services\CampaignService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class CampaignController extends Controller
 {
-    public function __construct()
-    {
+    public function __construct(
+        private CampaignService $campaignService
+    ) {
         $this->middleware('auth');
     }
 
     public function index(Request $request): Response
     {
-        $campaigns = Campaign::with(['creator', 'donations'])
-            ->when($request->search, function($query, $search) {
-                $query->where('title', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
-            })
-            ->when($request->category, function($query, $category) {
-                $query->where('cause_category', $category);
-            })
-            ->when($request->status, function($query, $status) {
-                $query->where('status', $status);
-            })
-            ->where('status', '!=', Campaign::STATUS_DRAFT)
-            ->orderBy('is_featured', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->paginate(12);
+        $filters = $request->only(['search', 'category', 'status']);
+        $campaigns = $this->campaignService->getCampaigns($filters, 12);
 
         return Inertia::render('Campaigns/Index', [
             'campaigns' => $campaigns,
-            'filters' => $request->only(['search', 'category', 'status']),
+            'filters' => $filters,
             'categories' => Campaign::getCauseCategories(),
         ]);
     }
@@ -52,36 +44,15 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StoreCampaignRequest $request): RedirectResponse
     {
-        Gate::authorize('create', Campaign::class);
-
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string|min:50',
-            'cause_category' => 'required|in:' . implode(',', array_keys(Campaign::getCauseCategories())),
-            'goal_amount' => 'required|numeric|min:1|max:1000000',
-            'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after:start_date',
-            'image' => 'nullable|image|max:2048',
-        ]);
-
-        $imagePath = null;
+        $data = $request->validated();
+        
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('campaigns', 'public');
+            $data['image'] = $request->file('image')->store('campaigns', 'public');
         }
 
-        Campaign::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'cause_category' => $request->cause_category,
-            'goal_amount' => $request->goal_amount,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'image' => $imagePath,
-            'created_by' => Auth::id(),
-            'status' => Campaign::STATUS_PENDING,
-        ]);
+        $campaign = $this->campaignService->createCampaign($data, Auth::user());
 
         return redirect()->route('campaigns.index')
             ->with('success', 'Campaign created successfully and is pending approval.');
@@ -123,54 +94,29 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function update(Request $request, Campaign $campaign): RedirectResponse
+    public function update(UpdateCampaignRequest $request, Campaign $campaign): RedirectResponse
     {
-        Gate::authorize('update', $campaign);
-
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string|min:50',
-            'cause_category' => 'required|in:' . implode(',', array_keys(Campaign::getCauseCategories())),
-            'target_amount' => 'required|numeric|min:1|max:1000000',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'featured_image' => 'nullable|image|max:2048',
-        ]);
-
-        $data = $request->only([
-            'title', 'description', 'cause_category', 'target_amount',
-            'start_date', 'end_date'
-        ]);
-
+        $data = $request->validated();
+        
         if ($request->hasFile('featured_image')) {
+            // Delete old image if it exists
+            if ($campaign->featured_image) {
+                Storage::disk('public')->delete($campaign->featured_image);
+            }
             $data['featured_image'] = $request->file('featured_image')->store('campaigns', 'public');
         }
 
-        // If campaign is approved and being edited, set back to pending
-        if ($campaign->status === Campaign::STATUS_ACTIVE) {
-            $data['status'] = Campaign::STATUS_PENDING;
-            $data['approved_by'] = null;
-            $data['approved_at'] = null;
-        }
-
-        $campaign->update($data);
+        $this->campaignService->updateCampaign($campaign, $data);
 
         return redirect()->route('campaigns.show', $campaign)
             ->with('success', 'Campaign updated successfully.');
     }
 
-    /**
-     * Approve a campaign (Admin/Campaign Manager only).
-     */
     public function approve(Campaign $campaign): RedirectResponse
     {
         Gate::authorize('approve', $campaign);
 
-        $campaign->update([
-            'status' => Campaign::STATUS_ACTIVE,
-            'approved_by' => Auth::id(),
-            'approved_at' => now(),
-        ]);
+        $this->campaignService->approveCampaign($campaign, Auth::user());
 
         return back()->with('success', 'Campaign approved successfully.');
     }
@@ -179,11 +125,10 @@ class CampaignController extends Controller
     {
         Gate::authorize('feature', $campaign);
 
-        $campaign->update([
-            'is_featured' => !$campaign->is_featured,
-        ]);
-
-        $message = $campaign->is_featured ? 'Campaign featured successfully.' : 'Campaign unfeatured successfully.';
+        $campaign = $this->campaignService->toggleFeatured($campaign);
+        $message = $campaign->is_featured 
+            ? 'Campaign featured successfully.' 
+            : 'Campaign unfeatured successfully.';
 
         return back()->with('success', $message);
     }
@@ -192,7 +137,12 @@ class CampaignController extends Controller
     {
         Gate::authorize('delete', $campaign);
 
-        $campaign->delete();
+        // Delete associated image
+        if ($campaign->image) {
+            Storage::disk('public')->delete($campaign->image);
+        }
+
+        $this->campaignService->deleteCampaign($campaign);
 
         return redirect()->route('campaigns.index')
             ->with('success', 'Campaign deleted successfully.');
