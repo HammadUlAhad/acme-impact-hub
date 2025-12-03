@@ -227,7 +227,7 @@ const getCategoryColor = (category: string) => {
                                 View Details
                             </Link>
                             <Link v-if="campaign.status === 'active'" 
-                               :href="`/donations/create?campaign_id=${campaign.id}`" 
+                               :href="`/campaigns/${campaign.id}/donate`" 
                                class="flex-1 text-center px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm">
                                 Donate Now
                             </Link>

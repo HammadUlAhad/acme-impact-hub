@@ -2,6 +2,10 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import DonutChart from '@/components/charts/DonutChart.vue';
+import LineChart from '@/components/charts/LineChart.vue';
+import BarChart from '@/components/charts/BarChart.vue';
 
 interface Stats {
     total_campaigns: number;
@@ -45,20 +49,110 @@ interface CategoryData {
     total_raised: number;
 }
 
+interface TrendData {
+    date: string;
+    count: number;
+    total: number;
+}
+
 interface Props {
     stats: Stats;
     recentCampaigns: Campaign[];
     recentDonations: Donation[];
     campaignsByCategory: CategoryData[];
     topCampaigns: Campaign[];
+    donationTrends: TrendData[];
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Admin', href: '/admin/dashboard' },
 ];
+
+// Chart data computed properties
+const categoryChartData = computed(() => {
+    const categories = props.campaignsByCategory || [];
+    return {
+        labels: categories.map(cat => getCategoryLabel(cat.cause_category)),
+        datasets: [{
+            data: categories.map(cat => cat.count),
+            backgroundColor: [
+                '#3B82F6', // Blue
+                '#10B981', // Green
+                '#F59E0B', // Yellow
+                '#EF4444', // Red
+                '#8B5CF6', // Purple
+                '#06B6D4', // Cyan
+            ],
+            borderWidth: 0
+        }]
+    };
+});
+
+const donationTrendData = computed(() => {
+    const trends = props.donationTrends || [];
+    return {
+        labels: trends.map(trend => new Date(trend.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+        datasets: [{
+            label: 'Donation Amount ($)',
+            data: trends.map(trend => trend.total),
+            borderColor: '#3B82F6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            fill: true,
+            tension: 0.4
+        }, {
+            label: 'Number of Donations',
+            data: trends.map(trend => trend.count),
+            borderColor: '#10B981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.4,
+            yAxisID: 'y1'
+        }]
+    };
+});
+
+const donationTrendOptions = computed(() => ({
+    scales: {
+        y: {
+            type: 'linear' as const,
+            display: true,
+            position: 'left' as const,
+            title: {
+                display: true,
+                text: 'Amount ($)'
+            }
+        },
+        y1: {
+            type: 'linear' as const,
+            display: true,
+            position: 'right' as const,
+            title: {
+                display: true,
+                text: 'Count'
+            },
+            grid: {
+                drawOnChartArea: false,
+            },
+        },
+    }
+}));
+
+const topCampaignsChartData = computed(() => {
+    const campaigns = props.topCampaigns?.slice(0, 5) || [];
+    return {
+        labels: campaigns.map(campaign => campaign.title.substring(0, 20) + (campaign.title.length > 20 ? '...' : '')),
+        datasets: [{
+            label: 'Amount Raised ($)',
+            data: campaigns.map(campaign => campaign.current_amount),
+            backgroundColor: '#3B82F6',
+            borderColor: '#1D4ED8',
+            borderWidth: 1
+        }]
+    };
+});
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -224,6 +318,70 @@ const getCategoryLabel = (category: string) => {
                         <Link href="/admin/users" class="block w-full text-left p-2 text-sm text-gray-700 hover:bg-gray-50 rounded">
                             Manage Users
                         </Link>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Donation Trends Chart -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="p-6 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">Donation Trends (30 Days)</h3>
+                        <p class="text-sm text-gray-500">Daily donation activity and amounts</p>
+                    </div>
+                    <div class="p-6">
+                        <div style="height: 300px;">
+                            <LineChart 
+                                v-if="donationTrendData.labels.length > 0" 
+                                :data="donationTrendData" 
+                                :options="donationTrendOptions"
+                                :height="300" 
+                            />
+                            <div v-else class="flex items-center justify-center h-full text-gray-500">
+                                <p>No donation data available</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campaigns by Category Chart -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="p-6 border-b border-gray-200">
+                        <h3 class="text-lg font-medium text-gray-900">Campaigns by Category</h3>
+                        <p class="text-sm text-gray-500">Distribution of active campaigns</p>
+                    </div>
+                    <div class="p-6">
+                        <div style="height: 300px;">
+                            <DonutChart 
+                                v-if="categoryChartData.labels.length > 0" 
+                                :data="categoryChartData" 
+                                :height="300" 
+                            />
+                            <div v-else class="flex items-center justify-center h-full text-gray-500">
+                                <p>No category data available</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Campaigns Chart -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Top Performing Campaigns</h3>
+                    <p class="text-sm text-gray-500">Campaigns with highest fundraising amounts</p>
+                </div>
+                <div class="p-6">
+                    <div style="height: 300px;">
+                        <BarChart 
+                            v-if="topCampaignsChartData.labels.length > 0" 
+                            :data="topCampaignsChartData" 
+                            :height="300" 
+                        />
+                        <div v-else class="flex items-center justify-center h-full text-gray-500">
+                            <p>No campaign data available</p>
+                        </div>
                     </div>
                 </div>
             </div>

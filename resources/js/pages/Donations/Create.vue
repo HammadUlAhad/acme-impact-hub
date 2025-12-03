@@ -15,7 +15,6 @@ const props = defineProps({
 });
 
 const form = useForm({
-    campaign_id: props.campaign.id,
     amount: '',
     payment_method: 'credit_card',
     is_anonymous: false,
@@ -23,19 +22,19 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route('donations.store'));
+    form.post(`/campaigns/${props.campaign.id}/donate`);
 };
 
 const breadcrumbs = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Campaigns', href: '/campaigns' },
     { title: props.campaign.title, href: `/campaigns/${props.campaign.id}` },
-    { title: 'Donate', href: `/donations/create?campaign_id=${props.campaign.id}` },
+    { title: 'Donate', href: `/campaigns/${props.campaign.id}/donate` },
 ];
 
 const progressPercentage = computed(() => {
-    if (!props.campaign.goal_amount) return 0;
-    return Math.min((props.campaign.total_raised / props.campaign.goal_amount) * 100, 100);
+    if (!props.campaign.target_amount) return 0;
+    return Math.min((props.campaign.current_amount / props.campaign.target_amount) * 100, 100);
 });
 
 const predefinedAmounts = [25, 50, 100, 250, 500, 1000];
@@ -43,6 +42,7 @@ const paymentMethods = [
     { value: 'credit_card', label: 'Credit Card' },
     { value: 'bank_transfer', label: 'Bank Transfer' },
     { value: 'payroll_deduction', label: 'Payroll Deduction' },
+    { value: 'digital_wallet', label: 'Digital Wallet' },
 ];
 </script>
 
@@ -83,8 +83,8 @@ const paymentMethods = [
                             <!-- Progress -->
                             <div class="space-y-2 mb-4">
                                 <div class="flex justify-between text-sm">
-                                    <span class="font-medium">${{ Number(campaign.total_raised || 0).toLocaleString() }} raised</span>
-                                    <span class="text-gray-500">of ${{ Number(campaign.goal_amount).toLocaleString() }} goal</span>
+                                    <span class="font-medium">${{ Number(campaign.current_amount || 0).toLocaleString() }} raised</span>
+                                    <span class="text-gray-500">of ${{ Number(campaign.target_amount).toLocaleString() }} goal</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
                                     <div class="bg-blue-600 h-2 rounded-full" :style="{ width: progressPercentage + '%' }"></div>
@@ -210,17 +210,15 @@ const paymentMethods = [
 
                                 <!-- Submit Button -->
                                 <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between pt-6 gap-3">
-                                    <Button 
-                                        type="button" 
-                                        variant="outline" 
-                                        @click="$inertia.visit(`/campaigns/${campaign.id}`)"
-                                        class="h-12 text-base order-2 sm:order-1"
+                                    <Link
+                                        :href="`/campaigns/${campaign.id}`"
+                                        class="h-12 text-base order-2 sm:order-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground px-6"
                                     >
                                         Cancel
-                                    </Button>
+                                    </Link>
                                     <Button 
                                         type="submit" 
-                                        :disabled="form.processing" 
+                                        :disabled="form.processing || !form.amount" 
                                         size="lg"
                                         class="h-12 text-base order-1 sm:order-2"
                                     >

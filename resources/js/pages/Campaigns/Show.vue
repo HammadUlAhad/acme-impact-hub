@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,8 +26,8 @@ const props = defineProps({
 });
 
 const progressPercentage = computed(() => {
-    if (!props.campaign.goal_amount) return 0;
-    return Math.min((props.campaign.total_raised / props.campaign.goal_amount) * 100, 100);
+    if (!props.campaign.target_amount) return 0;
+    return Math.min((props.campaign.current_amount / props.campaign.target_amount) * 100, 100);
 });
 
 const breadcrumbs = [
@@ -90,8 +90,8 @@ const breadcrumbs = [
                         <!-- Progress -->
                         <div class="space-y-2">
                             <div class="flex justify-between text-sm">
-                                <span class="font-medium">${{ Number(campaign.total_raised || 0).toLocaleString() }} raised</span>
-                                <span class="text-gray-500">of ${{ Number(campaign.goal_amount).toLocaleString() }} goal</span>
+                                <span class="font-medium">${{ Number(campaign.current_amount || 0).toLocaleString() }} raised</span>
+                                <span class="text-gray-500">of ${{ Number(campaign.target_amount).toLocaleString() }} goal</span>
                             </div>
                             <div class="w-full bg-gray-200 rounded-full h-2">
                                 <div class="bg-blue-600 h-2 rounded-full" :style="{ width: progressPercentage + '%' }"></div>
@@ -112,9 +112,14 @@ const breadcrumbs = [
                                 {{ new Date(campaign.end_date).toLocaleDateString() }}
                             </div>
                             
-                            <Button :href="`/donations/create?campaign_id=${campaign.id}`" size="lg">
+                            <Link v-if="campaign.status === 'active'" 
+                                  :href="`/campaigns/${campaign.id}/donate`" 
+                                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 h-10 px-6 bg-primary text-primary-foreground shadow-xs hover:bg-primary/90">
                                 Donate Now
-                            </Button>
+                            </Link>
+                            <div v-else class="text-sm text-gray-500 font-medium">
+                                {{ campaign.status === 'pending' ? 'Pending Approval' : 'Campaign Ended' }}
+                            </div>
                         </div>
                     </CardContent>
                 </Card>

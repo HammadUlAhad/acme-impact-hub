@@ -25,6 +25,7 @@ class DashboardController extends Controller
         $topCampaigns = $this->analyticsService->getTopCampaigns(5);
         $recentDonations = $this->analyticsService->getRecentDonations(5);
         $campaignsByCategory = $this->analyticsService->getCampaignsByCategory();
+        $donationTrends = $this->analyticsService->getDonationTrends(30);
 
         return Inertia::render('Admin/Dashboard', [
             'stats' => $metrics,
@@ -32,6 +33,7 @@ class DashboardController extends Controller
             'recentDonations' => $recentDonations,
             'campaignsByCategory' => $campaignsByCategory,
             'topCampaigns' => $topCampaigns,
+            'donationTrends' => $donationTrends,
         ]);
     }
 

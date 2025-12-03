@@ -6,6 +6,7 @@ use App\Models\Campaign;
 use App\Models\Donation;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class AnalyticsService
 {
@@ -76,21 +77,13 @@ class AnalyticsService
     /**
      * Get donation trends by period.
      */
-    public function getDonationTrends(string $period = 'month'): Collection
+    public function getDonationTrends(int $days = 30): Collection
     {
-        $dateFormat = match ($period) {
-            'day' => '%Y-%m-%d',
-            'week' => '%Y-%u',
-            'month' => '%Y-%m',
-            'year' => '%Y',
-            default => '%Y-%m',
-        };
-
-        return Donation::selectRaw("DATE_FORMAT(created_at, '{$dateFormat}') as period, COUNT(*) as count, SUM(amount) as total")
+        return Donation::selectRaw('DATE(created_at) as date, COUNT(*) as count, SUM(amount) as total')
             ->where('payment_status', Donation::STATUS_COMPLETED)
-            ->where('created_at', '>=', now()->subMonths(12))
-            ->groupBy('period')
-            ->orderBy('period')
+            ->where('created_at', '>=', now()->subDays($days))
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('date')
             ->get();
     }
 
